@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  reconx:
+    build: .
+    image: reconx:latest
+    container_name: reconx-scanner
+    volumes:
+      - ./output:/app/output
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+    # Override command: docker-compose run reconx -t example.com --html-report
+    command: ["--help"]

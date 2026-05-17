@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReconX Report — http://testphp.vulnweb.com</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #273449;
+            --border: #334155;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent2: #818cf8;
+            --critical: #dc2626;
+            --high: #ea580c;
+            --medium: #d97706;
+            --low: #2563eb;
+            --info: #6b7280;
+            --success: #16a34a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(56,189,248,0.08) 0%, transparent 60%);
+        }
+        .header-content { position: relative; z-index: 1; }
+        .logo { font-size: 2rem; font-weight: 800; color: var(--accent);
+                 letter-spacing: -0.05em; margin-bottom: 4px; }
+        .logo span { color: var(--text-muted); font-weight: 300; }
+        .target-info { margin-top: 12px; }
+        .target-url { font-size: 1.1rem; color: var(--accent); font-family: monospace; }
+        .meta-grid { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+        .meta-item { }
+        .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+                       color: var(--text-muted); }
+        .meta-value { font-size: 13px; color: var(--text); }
+        .risk-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px; font-weight: 700;
+            font-size: 13px; margin-top: 12px;
+            border: 2px solid currentColor;
+        }
+        .nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            display: flex; gap: 0;
+            overflow-x: auto;
+        }
+        .nav a {
+            color: var(--text-muted); text-decoration: none;
+            padding: 14px 20px; display: block;
+            font-size: 13px; white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+        .main { max-width: 1400px; margin: 0 auto; padding: 32px 40px; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        }
+        .stat-card.critical::before { background: var(--critical); }
+        .stat-card.high::before { background: var(--high); }
+        .stat-card.medium::before { background: var(--medium); }
+        .stat-card.low::before { background: var(--low); }
+        .stat-card.info::before { background: var(--info); }
+        .stat-card.total::before { background: var(--accent); }
+        .stat-number { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+        .stat-card.critical .stat-number { color: var(--critical); }
+        .stat-card.high .stat-number { color: var(--high); }
+        .stat-card.medium .stat-number { color: var(--medium); }
+        .stat-card.low .stat-number { color: var(--low); }
+        .stat-card.info .stat-number { color: var(--info); }
+        .stat-card.total .stat-number { color: var(--accent); }
+        .stat-label { font-size: 12px; text-transform: uppercase;
+                       letter-spacing: 0.08em; color: var(--text-muted); margin-top: 4px; }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            background: var(--surface2);
+        }
+        .card-header h2 {
+            font-size: 15px; font-weight: 600; color: var(--text);
+        }
+        .count-badge {
+            background: var(--border); color: var(--text-muted);
+            border-radius: 10px; padding: 2px 8px; font-size: 12px;
+        }
+        .card-body { padding: 0; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            background: var(--surface2);
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(51,65,85,0.5);
+            vertical-align: top;
+            color: var(--text);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(56,189,248,0.04); }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.05em; color: #fff;
+        }
+        .tech-tag {
+            display: inline-block; background: rgba(129,140,248,0.15);
+            color: var(--accent2); border: 1px solid rgba(129,140,248,0.3);
+            padding: 3px 10px; border-radius: 12px; font-size: 12px; margin: 3px;
+        }
+        .source-tag {
+            display: inline-block; background: var(--surface2);
+            color: var(--text-muted); padding: 2px 8px;
+            border-radius: 4px; font-size: 11px; font-family: monospace;
+        }
+        .mono { font-family: 'Consolas', 'SF Mono', monospace; font-size: 12px; }
+        .small { font-size: 12px; }
+        .url-cell { max-width: 250px; word-break: break-all; }
+        .section-title {
+            font-size: 20px; font-weight: 700; color: var(--text);
+            margin: 32px 0 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        ul.url-list {
+            list-style: none; padding: 16px 24px;
+            max-height: 400px; overflow-y: auto;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 4px;
+        }
+        ul.url-list li { padding: 4px 8px; border-radius: 4px; }
+        ul.url-list li:hover { background: var(--surface2); }
+        .ai-card { border-color: rgba(129,140,248,0.4); }
+        .ai-card .card-header {
+            background: linear-gradient(135deg, #1e293b, rgba(129,140,248,0.1));
+        }
+        .ai-summary { padding: 20px 24px; line-height: 1.8; }
+        .ai-summary p { margin-bottom: 12px; color: var(--text); }
+        .empty-state {
+            padding: 32px; text-align: center;
+            color: var(--text-muted); font-size: 13px;
+        }
+        .filter-bar {
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+        }
+        .filter-btn {
+            padding: 4px 12px; border-radius: 16px; border: 1px solid var(--border);
+            background: transparent; color: var(--text-muted);
+            cursor: pointer; font-size: 12px; transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            color: var(--accent); border-color: var(--accent);
+            background: rgba(56,189,248,0.08);
+        }
+        .chart-container { padding: 24px; }
+        canvas { max-width: 100%; }
+        footer {
+            text-align: center; padding: 24px;
+            color: var(--text-muted); font-size: 12px;
+            border-top: 1px solid var(--border); margin-top: 40px;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        @media print {
+            body { background: white; color: black; }
+            .nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <div class="logo">Recon<span>X</span></div>
+    <div style="color:var(--text-muted);font-size:12px">Automated Reconnaissance &amp; Vulnerability Scanner</div>
+    <div class="target-info">
+      <div class="target-url">http://testphp.vulnweb.com</div>
+    </div>
+    <div class="meta-grid">
+        <div class="meta-item">
+            <div class="meta-label">IP Address</div>
+            <div class="meta-value mono">44.228.249.3</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Scan Started</div>
+            <div class="meta-value">2025-03-15 14:30:22</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Duration</div>
+            <div class="meta-value">0:17:33</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">URLs Discovered</div>
+            <div class="meta-value">16</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Vulnerabilities</div>
+            <div class="meta-value">16</div>
+        </div>
+    </div>
+    <div class="risk-badge" style="color:#dc2626">
+        ⚠ Overall Risk: Critical
+    </div>
+  </div>
+</div>
+
+<nav class="nav">
+    <a href="#overview">Overview</a>
+    <a href="#vulnerabilities">Vulnerabilities</a>
+    <a href="#recon">Reconnaissance</a>
+    <a href="#crawl">Crawl Results</a>
+    <a href="#headers">Security Headers</a>
+    
+</nav>
+
+<main class="main">
+
+
+
+<div id="overview">
+<h2 class="section-title">📊 Vulnerability Overview</h2>
+
+<div class="stats-grid">
+    <div class="stat-card total">
+        <div class="stat-number">16</div>
+        <div class="stat-label">Total Findings</div>
+    </div>
+    <div class="stat-card critical">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Critical</div>
+    </div>
+    <div class="stat-card high">
+        <div class="stat-number">3</div>
+        <div class="stat-label">High</div>
+    </div>
+    <div class="stat-card medium">
+        <div class="stat-number">6</div>
+        <div class="stat-label">Medium</div>
+    </div>
+    <div class="stat-card low">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Low</div>
+    </div>
+    <div class="stat-card info">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Informational</div>
+    </div>
+</div>
+</div>
+
+<div id="vulnerabilities">
+<h2 class="section-title">🔴 Vulnerability Findings <span class="count-badge">16</span></h2>
+<div class="card">
+    <div class="filter-bar">
+        <span style="font-size:12px;color:var(--text-muted)">Filter:</span>
+        <button class="filter-btn active" onclick="filterVulns('all')">All</button>
+        <button class="filter-btn" onclick="filterVulns('critical')" style="color:#dc2626;border-color:#dc2626">Critical</button>
+        <button class="filter-btn" onclick="filterVulns('high')" style="color:#ea580c;border-color:#ea580c">High</button>
+        <button class="filter-btn" onclick="filterVulns('medium')" style="color:#d97706;border-color:#d97706">Medium</button>
+        <button class="filter-btn" onclick="filterVulns('low')" style="color:#2563eb;border-color:#2563eb">Low</button>
+        <button class="filter-btn" onclick="filterVulns('info')">Info</button>
+    </div>
+    <div class="card-body">
+        <table id="vuln-table"><thead><tr><th>Severity</th><th>Type</th><th>URL</th><th>Description</th><th>Evidence</th><th>Remediation</th><th>Source</th></tr></thead><tbody>
+            <tr style="background:#fef2f2">
+                <td><span class="badge" style="background:#dc2626">CRITICAL</span></td>
+                <td><strong>SQL Injection (Error-Based)</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/listproducts.php?cat=1</td>
+                <td>Parameter 'cat' may be vulnerable to SQL injection — database error detected</td>
+                <td class="mono small">Payload: ' | Error pattern: sql syntax</td>
+                <td>Use parameterized queries / prepared statements</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fef2f2">
+                <td><span class="badge" style="background:#dc2626">CRITICAL</span></td>
+                <td><strong>SQL Injection (Error-Based)</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/artist.php?artist=1</td>
+                <td>Parameter 'artist' may be vulnerable to SQL injection — database error detected</td>
+                <td class="mono small">Payload: ' OR '1'='1 | Error pattern: mysql_fetch</td>
+                <td>Use parameterized queries / prepared statements</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fef2f2">
+                <td><span class="badge" style="background:#dc2626">CRITICAL</span></td>
+                <td><strong>Sensitive File/Directory Exposed</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/.git/HEAD</td>
+                <td>Sensitive path is publicly accessible: /.git/HEAD</td>
+                <td class="mono small">HTTP 200: ref: refs/heads/master</td>
+                <td>Block access to .git directory via server config</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fff7ed">
+                <td><span class="badge" style="background:#ea580c">HIGH</span></td>
+                <td><strong>Reflected Cross-Site Scripting (XSS)</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/search.php?test=query</td>
+                <td>Parameter 'test' reflects user input without sanitization</td>
+                <td class="mono small">Payload reflected: &lt;script&gt;alert(1)&lt;/script&gt;</td>
+                <td>Encode all user-supplied input before reflecting it in HTML responses</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fff7ed">
+                <td><span class="badge" style="background:#ea580c">HIGH</span></td>
+                <td><strong>Sensitive File/Directory Exposed</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/phpinfo.php</td>
+                <td>Sensitive path is publicly accessible: /phpinfo.php</td>
+                <td class="mono small">HTTP 200: PHP Version 5.6.40 | Server configuration details exposed</td>
+                <td>Remove phpinfo.php from production servers</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fff7ed">
+                <td><span class="badge" style="background:#ea580c">HIGH</span></td>
+                <td><strong>Reflected Cross-Site Scripting (XSS)</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com/guestbook.php</td>
+                <td>Parameter 'name' reflects user input without sanitization (Stored XSS risk)</td>
+                <td class="mono small">Payload reflected: &quot;&gt;&lt;svg onload=alert(1)&gt;</td>
+                <td>Sanitize and encode all user input stored and reflected in HTML</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>CORS Misconfiguration: Wildcard Origin</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Server allows requests from any origin (wildcard *)</td>
+                <td class="mono small">Access-Control-Allow-Origin: *</td>
+                <td>Restrict allowed origins to specific trusted domains</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>Missing Security Header: Content-Security-Policy</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Missing Content-Security-Policy header — allows XSS via inline scripts</td>
+                <td class="mono small">Header 'Content-Security-Policy' not present in response</td>
+                <td>Implement a restrictive CSP policy</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>Missing Security Header: Strict-Transport-Security</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Missing HSTS header — allows downgrade attacks</td>
+                <td class="mono small">Header 'Strict-Transport-Security' not present in response</td>
+                <td>Add Strict-Transport-Security: max-age=31536000; includeSubDomains</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>Clickjacking Vulnerability</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Page can be embedded in an iframe — vulnerable to clickjacking attacks</td>
+                <td class="mono small">No X-Frame-Options or CSP frame-ancestors directive found</td>
+                <td>Add X-Frame-Options: DENY or CSP frame-ancestors 'none'</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>Missing Security Header: X-Frame-Options</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Missing X-Frame-Options — site may be vulnerable to clickjacking</td>
+                <td class="mono small">Header 'X-Frame-Options' not present in response</td>
+                <td>Add X-Frame-Options: DENY or SAMEORIGIN</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#eff6ff">
+                <td><span class="badge" style="background:#2563eb">LOW</span></td>
+                <td><strong>Server Version Disclosure</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Server header discloses version information: Apache/2.4.7 (Ubuntu)</td>
+                <td class="mono small">Server: Apache/2.4.7 (Ubuntu)</td>
+                <td>Remove or obscure the Server header via ServerTokens Prod</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#eff6ff">
+                <td><span class="badge" style="background:#2563eb">LOW</span></td>
+                <td><strong>Missing Security Header: X-Content-Type-Options</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Missing X-Content-Type-Options — allows MIME-type sniffing</td>
+                <td class="mono small">Header 'X-Content-Type-Options' not present in response</td>
+                <td>Add X-Content-Type-Options: nosniff</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#f9fafb">
+                <td><span class="badge" style="background:#6b7280">INFO</span></td>
+                <td><strong>Technology Disclosure via X-Powered-By</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>X-Powered-By header reveals backend technology: PHP/5.6.40</td>
+                <td class="mono small">X-Powered-By: PHP/5.6.40</td>
+                <td>Remove X-Powered-By header via php.ini expose_php = Off</td>
+                <td><span class="source-tag">custom</span></td>
+            </tr>
+            <tr style="background:#eff6ff">
+                <td><span class="badge" style="background:#2563eb">LOW</span></td>
+                <td><strong>Nikto Finding</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>Server leaks inodes via ETags, header found with file /</td>
+                <td class="mono small">+ Server leaks inodes via ETags, header found with file /</td>
+                <td>Disable ETag header or configure to not include inode information</td>
+                <td><span class="source-tag">nikto</span></td>
+            </tr>
+            <tr style="background:#fffbeb">
+                <td><span class="badge" style="background:#d97706">MEDIUM</span></td>
+                <td><strong>Nikto Finding</strong></td>
+                <td class="url-cell">http://testphp.vulnweb.com</td>
+                <td>The anti-clickjacking X-Frame-Options header is not present</td>
+                <td class="mono small">+ The anti-clickjacking X-Frame-Options header is not present</td>
+                <td>Add X-Frame-Options header</td>
+                <td><span class="source-tag">nikto</span></td>
+            </tr></tbody></table>
+    </div>
+</div>
+</div>
+
+<div id="recon">
+<h2 class="section-title">🔍 Reconnaissance Findings</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+
+<div class="card">
+    <div class="card-header"><h2>🌐 Subdomains <span class="count-badge">4</span></h2></div>
+    <div class="card-body">
+        <table><thead><tr><th>Subdomain</th><th>IP Address</th></tr></thead><tbody>
+            <tr>
+                <td>www.vulnweb.com</td>
+                <td>44.228.249.3</td>
+            </tr>
+            <tr>
+                <td>admin.vulnweb.com</td>
+                <td>44.228.249.3</td>
+            </tr>
+            <tr>
+                <td>mail.vulnweb.com</td>
+                <td>44.228.249.3</td>
+            </tr>
+            <tr>
+                <td>ftp.vulnweb.com</td>
+                <td>44.228.249.3</td>
+            </tr></tbody></table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🔌 Open Ports <span class="count-badge">4</span></h2></div>
+    <div class="card-body">
+        <table><thead><tr><th>Port</th><th>Service</th><th>Banner</th></tr></thead><tbody>
+            <tr>
+                <td><strong>22</strong></td>
+                <td>SSH</td>
+                <td class="mono small">SSH-2.0-OpenSSH_7.4</td>
+            </tr>
+            <tr>
+                <td><strong>80</strong></td>
+                <td>HTTP</td>
+                <td class="mono small">HTTP/1.1 200 OK
+Server: Apache/2.4.7</td>
+            </tr>
+            <tr>
+                <td><strong>443</strong></td>
+                <td>HTTPS</td>
+                <td class="mono small"></td>
+            </tr>
+            <tr>
+                <td><strong>3306</strong></td>
+                <td>MySQL</td>
+                <td class="mono small"></td>
+            </tr></tbody></table>
+    </div>
+</div>
+
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+<div class="card">
+    <div class="card-header"><h2>🌍 DNS Records</h2></div>
+    <div class="card-body">
+        <table><thead><tr><th>Type</th><th>Value</th></tr></thead><tbody><tr><td><strong>A</strong></td><td class='mono'>44.228.249.3</td></tr><tr><td><strong>MX</strong></td><td class='mono'>10 mail.vulnweb.com.</td></tr><tr><td><strong>NS</strong></td><td class='mono'>ns1.vulnweb.com.</td></tr><tr><td><strong>NS</strong></td><td class='mono'>ns2.vulnweb.com.</td></tr><tr><td><strong>TXT</strong></td><td class='mono'>v=spf1 include:_spf.vulnweb.com ~all</td></tr></tbody></table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>⚙️ Technologies Detected</h2></div>
+    <div class="card-body" style="padding:20px 24px">
+        <span class="tech-tag">Apache HTTP Server</span><span class="tech-tag">PHP</span><span class="tech-tag">jQuery</span><span class="tech-tag">Bootstrap</span>
+    </div>
+</div>
+
+</div>
+</div>
+
+<div id="headers">
+<h2 class="section-title">🛡️ Security Headers</h2>
+<div class="card">
+    <div class="card-body">
+        <table>
+            <thead><tr><th>Status</th><th>Header</th><th>Value</th></tr></thead>
+            <tbody>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>Strict-Transport-Security</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>Content-Security-Policy</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>X-Frame-Options</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr>
+            <tr>
+                <td style="color:#16a34a;font-weight:bold">✓</td>
+                <td>X-Content-Type-Options</td>
+                <td class="mono small">nosniff</td>
+            </tr>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>X-XSS-Protection</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>Referrer-Policy</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr>
+            <tr>
+                <td style="color:#dc2626;font-weight:bold">✗</td>
+                <td>Permissions-Policy</td>
+                <td class="mono small"><em style="color:#9ca3af">Not set</em></td>
+            </tr></tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<div id="crawl">
+<h2 class="section-title">🕷️ Crawl Results</h2>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+
+<div class="card">
+    <div class="card-header"><h2>🚨 Interesting Paths</h2></div>
+    <div class="card-body">
+        <table><thead><tr><th>Status</th><th>URL</th></tr></thead><tbody>
+                <tr>
+                    <td><span style="color:#16a34a;font-weight:bold">200</span></td>
+                    <td class="mono small">http://testphp.vulnweb.com/admin/</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#16a34a;font-weight:bold">200</span></td>
+                    <td class="mono small">http://testphp.vulnweb.com/phpinfo.php</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#16a34a;font-weight:bold">200</span></td>
+                    <td class="mono small">http://testphp.vulnweb.com/.git/HEAD</td>
+                </tr>
+                <tr>
+                    <td><span style="color:#16a34a;font-weight:bold">200</span></td>
+                    <td class="mono small">http://testphp.vulnweb.com/robots.txt</td>
+                </tr></tbody></table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📝 Forms Discovered <span class="count-badge">3</span></h2></div>
+    <div class="card-body">
+        <table><thead><tr><th>URL</th><th>Method</th><th>Fields</th></tr></thead><tbody>
+            <tr>
+                <td class="mono small">http://testphp.vulnweb.com/login.php</td>
+                <td><span class="badge" style="background:#6366f1">POST</span></td>
+                <td class="small">uname (text), pass (password), submit (submit)</td>
+            </tr>
+            <tr>
+                <td class="mono small">http://testphp.vulnweb.com/search.php</td>
+                <td><span class="badge" style="background:#6366f1">GET</span></td>
+                <td class="small">searchFor (text), goButton (submit)</td>
+            </tr>
+            <tr>
+                <td class="mono small">http://testphp.vulnweb.com/guestbook.php</td>
+                <td><span class="badge" style="background:#6366f1">POST</span></td>
+                <td class="small">name (text), text (textarea), submit (submit)</td>
+            </tr></tbody></table>
+    </div>
+</div>
+
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>🔗 Discovered URLs <span class="count-badge">16</span></h2></div>
+    <div class="card-body">
+        <ul class="url-list"><li class="mono small">http://testphp.vulnweb.com/</li><li class="mono small">http://testphp.vulnweb.com/admin/</li><li class="mono small">http://testphp.vulnweb.com/artist.php?artist=1</li><li class="mono small">http://testphp.vulnweb.com/artists.php</li><li class="mono small">http://testphp.vulnweb.com/cart.php</li><li class="mono small">http://testphp.vulnweb.com/categories.php</li><li class="mono small">http://testphp.vulnweb.com/guestbook.php</li><li class="mono small">http://testphp.vulnweb.com/hpp/?pp=12</li><li class="mono small">http://testphp.vulnweb.com/index.php</li><li class="mono small">http://testphp.vulnweb.com/listproducts.php?cat=1</li><li class="mono small">http://testphp.vulnweb.com/listproducts.php?cat=2</li><li class="mono small">http://testphp.vulnweb.com/login.php</li><li class="mono small">http://testphp.vulnweb.com/search.php?test=query</li><li class="mono small">http://testphp.vulnweb.com/showimage.php?file=./pictures/1.jpg</li><li class="mono small">http://testphp.vulnweb.com/signup.php</li><li class="mono small">http://testphp.vulnweb.com/userinfo.php</li></ul>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><h2>📦 JavaScript Files <span class="count-badge">3</span></h2></div>
+    <div class="card-body">
+        <ul class="url-list"><li class="mono small">http://testphp.vulnweb.com/js/bootstrap.min.js</li><li class="mono small">http://testphp.vulnweb.com/js/jquery-1.7.min.js</li><li class="mono small">http://testphp.vulnweb.com/js/validate.js</li></ul>
+    </div>
+</div>
+
+</div>
+
+</main>
+
+<footer>
+    Generated by <strong>ReconX</strong> v1.0.0 &nbsp;·&nbsp;
+    2026-05-17 00:33:42 &nbsp;·&nbsp;
+    ⚠ Only scan systems you are authorized to test
+</footer>
+
+<script>
+function filterVulns(severity) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const rows = document.querySelectorAll('#vuln-table tbody tr');
+    rows.forEach(row => {
+        if (severity === 'all') {
+            row.style.display = '';
+        } else {
+            const badge = row.querySelector('.badge');
+            if (badge && badge.textContent.trim().toLowerCase() === severity) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+}
+
+// Smooth scroll for nav links
+document.querySelectorAll('.nav a').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        const id = link.getAttribute('href').slice(1);
+        document.getElementById(id)?.scrollIntoView({behavior: 'smooth'});
+    });
+});
+</script>
+</body>
+</html>
