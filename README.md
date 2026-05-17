@@ -1,151 +1,188 @@
- Recon_scanner: Automated Reconnaissance & Vulnerability Scanner
-📌 Project Overview
+Automated Reconnaissance & Vulnerability Scanner
+(Project Name: ReconX – or rename as needed)
 
-The Automated Reconnaissance & Vulnerability Scanner is a CLI-based security tool designed to simulate a real-world web application security assessment workflow. It automates both passive and active reconnaissance, discovers attack surface information, and performs vulnerability scanning using integrated security tools.
+A modular CLI-based cybersecurity automation framework for passive & active reconnaissance, attack surface mapping, vulnerability scanning, and HTML report generation.
 
-The tool is intended for educational and authorized security testing purposes only.
+ Overview
 
-🎯 Objectives
-Automate reconnaissance of web targets (domain, subdomain, URL, or IP).
-Identify and map attack surface components.
-Perform crawling and endpoint discovery.
-Extract parameters, JavaScript files, and hidden assets.
-Detect common web vulnerabilities using automated scanners.
-Generate structured and readable security reports.
-⚙️ Features
-🔍 Reconnaissance (Passive & Active)
+This tool automates real-world security assessment workflows by combining:
+
+ Passive Reconnaissance
+ Active Reconnaissance
+ Web Crawling & Endpoint Discovery
+ Vulnerability Scanning (Nikto + Nuclei)
+Structured Reporting (CLI + JSON + HTML)
+
+It is designed for ethical hacking labs, bug bounty recon, and cybersecurity education.
+
+ Disclaimer
+
+This tool is strictly intended for:
+
+✔ Authorized penetration testing
+✔ Security research labs (DVWA, Juice Shop, etc.)
+✔ Bug bounty programs with permission
+
+❌ Unauthorized scanning is illegal and strictly prohibited.
+
+🚀 Features
+🔍 Reconnaissance Engine
 Subdomain enumeration
-DNS information gathering
-Open port and service detection
+DNS record extraction
+WHOIS lookup
+Technology fingerprinting
 HTTP header analysis
-Technology stack detection
+Open port detection (safe mode)
 JavaScript file discovery
 Endpoint and directory enumeration
-Parameter and form extraction
+🧠 Crawling System
+Recursive web crawling (configurable depth)
+URL and parameter extraction
+Form detection
+JavaScript endpoint parsing
+Smart deduplication & filtering
+⚡ Active Recon
+Lightweight port scanning
+Service banner grabbing
+HTTP probing
+Rate-limited requests (safe-by-default)
 🧪 Vulnerability Scanning
-Integration with Nikto for web server scanning
-Integration with Nuclei for template-based vulnerability detection
-Custom vulnerability checks (extendable module)
-Severity classification of findings
-🌐 Crawling & Analysis
-URL crawling and endpoint collection
-Recursive crawling support (optional feature)
-Smart filtering and deduplication of results
-JavaScript parsing for hidden endpoints and APIs
-📊 Reporting
-Structured scan report generation
-Summary of reconnaissance data
-Detailed vulnerability findings
-Severity tagging (Low / Medium / High / Critical)
-Timestamped scan results
-Exportable report format (CLI / file-based output)
+
+Integrated security tools:
+
+🔹 Nikto (web server scanning)
+🔹 Nuclei (template-based scanning)
+
+Custom checks:
+
+Missing security headers
+Exposed directories
+Weak HTTP methods
+Misconfigurations
+📊 Reporting Engine
+
+The tool generates:
+
+✔ CLI Report
+Colored structured output
+Severity-based grouping
+✔ JSON Report
+Machine-readable output for automation
+✔ HTML Report (🔥 Hacker Theme UI)
+Dark cyber UI design
+Neon highlights (green/cyan/purple)
+Scan timeline visualization
+Vulnerability dashboard
+Clickable endpoints
+Severity cards (Low → Critical)
 🏗️ Architecture
-
-The tool follows a modular architecture for scalability and maintainability:
-
-project/
+recon_tool/
 │
-├── recon/               # Reconnaissance modules
-├── scanner/             # Vulnerability scanning modules
-├── crawler/             # URL crawling engine
-├── utils/               # Helper functions (logging, parsing, etc.)
-├── report/              # Report generation
-├── config/              # Configuration files
-└── main.py              # CLI entry point
-🚀 Installation
-1. Clone the Repository
-git clone https://github.com/your-username/recon-scanner.git
-cd recon-scanner
-2. Create Virtual Environment (Recommended)
+├── core/              # CLI engine + config + logging
+├── recon/             # passive + active recon modules
+├── crawler/           # web crawler + JS analyzer
+├── scanner/           # nikto + nuclei + custom checks
+├── report/            # HTML + JSON report generator
+├── utils/             # helpers (requests, parsing, formatting)
+├── templates/         # HTML themes (hacker UI)
+│
+├── main.py            # entry point
+├── requirements.txt
+└── setup.py
+⚙️ Installation
+1. Clone Repository
+git clone https://github.com/your-username/reconx.git
+cd reconx
+2. Create Virtual Environment
 python3 -m venv venv
 source venv/bin/activate   # Linux/Mac
 venv\Scripts\activate      # Windows
 3. Install Dependencies
 pip install -r requirements.txt
 4. Install External Tools
-
-Ensure the following tools are installed and available in PATH:
-
 Nikto
-Nuclei
-
-Example:
-
 sudo apt install nikto
-GO install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+Nuclei
+go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
 🧑‍💻 Usage
-Basic Scan
+🔹 Basic Scan
 python main.py -t example.com
-Scan with Full Recon + Vulnerability Assessment
-python main.py -t https://example.com --full-scan
-Scan IP Address
-python main.py -t 192.168.1.1
-Enable Verbose Mode
-python main.py -t example.com -v
+🔹 Full Recon + Vulnerability Scan
+python main.py -t example.com --full
+🔹 Recon Only Mode
+python main.py -t example.com --recon
+🔹 Scan Only Mode
+python main.py -t example.com --scan
 📤 Output Example
 [+] Target: example.com
-[+] Scan Started: 2026-05-17 10:30:00
+[+] Mode: Full Scan Initiated
 
-[RECONNAISSANCE]
-- Subdomains Found: 5
-- Open Ports: 80, 443
-- Technologies: Nginx, PHP, Cloudflare
-- JS Files: 12 discovered
-- Endpoints: 45 collected
+==================== RECON ====================
+Subdomains:        14 found
+Technologies:      Nginx, PHP, Cloudflare
+JS Files:          9 discovered
+Endpoints:         52 collected
 
-[VULNERABILITIES]
-- SQL Injection (High)
-- Missing Security Headers (Medium)
-- XSS Reflected (High)
+================ VULNERABILITIES ================
+[HIGH] Missing Security Headers
+[HIGH] XSS Vulnerability Detected
+[MEDIUM] Open Directory Listing
 
-[REPORT]
-Report saved to: reports/example_com_17052026.json
-📊 Report Structure
+==================== REPORT ====================
+HTML Report: reports/example_com_report.html
+JSON Report: reports/example_com_report.json
+📊 Report Features (HTML)
 
-The final report includes:
+The HTML report includes:
 
-Target Information
-Reconnaissance Data
-Crawled URLs & Endpoints
-Extracted Parameters
-JavaScript File Analysis
-Vulnerability Findings
-Risk Levels
-Scan Timestamp
-🧩 Bonus Features (Optional Enhancements)
-🔁 Recursive crawling engine
-⚡ Multi-threaded scanning for performance
-🧠 AI-based summary of vulnerabilities
-🌐 Web-based dashboard (Flask / FastAPI)
-📄 HTML/PDF report export
-🐳 Docker containerization
-🕵️ Stealth scanning (rate limiting & delay control)
-📊 Visual analytics dashboard
-⚠️ Ethical & Legal Disclaimer
+🧠 Target summary dashboard
+🔍 Recon intelligence panel
+🧪 Vulnerability breakdown
+⚠️ Risk severity visualization
+📂 Endpoint explorer
+⏱️ Scan timeline
+🎨 Cyberpunk hacker UI theme
+🧩 Bonus Features
+⚡ Multi-threaded scanning engine
+🔄 Async crawling (aiohttp)
+🧠 AI-powered vulnerability summarization (optional)
+🐳 Docker support
+🌐 Web dashboard (future upgrade)
+📡 API mode (FastAPI support)
+🕵️ Stealth / rate-limited scanning mode
+📦 requirements.txt
+requests
+beautifulsoup4
+lxml
+colorama
+tqdm
+dnspython
+python-nmap
+jinja2
+termcolor
+aiohttp
+🧾 setup.py
+from setuptools import setup, find_packages
 
-This tool is developed strictly for educational purposes and authorized security testing only.
-
-❗ Important Rules:
-Do NOT scan systems without explicit permission.
-Use only on:
-Your own systems
-Local virtual labs (DVWA, Juice Shop, etc.)
-Authorized bug bounty programs
-The developer assumes no responsibility for misuse of this tool.
-🛠️ Technologies Used
-Python 3.x
-Requests / HTTP libraries
-Subprocess automation
-BeautifulSoup / Scrapy (for crawling)
-Nikto (vulnerability scanning)
-Nuclei (template-based scanning)
-📅 Project Status
-
-🚧 In Development — Core features under active implementation
-
-👨‍💻 Author
-Name: Your Name
-GitHub: https://github.com/your-username
-📜 License
-
-This project is licensed under the MIT License.
+setup(
+    name="reconx",
+    version="1.0.0",
+    packages=find_packages(),
+    install_requires=[
+        "requests",
+        "beautifulsoup4",
+        "lxml",
+        "colorama",
+        "tqdm",
+        "dnspython",
+        "python-nmap",
+        "jinja2",
+        "termcolor",
+        "aiohttp"
+    ],
+    entry_points={
+        "console_scripts": [
+            "reconx = main:main"
+        ]
+    },
+)
