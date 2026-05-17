@@ -2,7 +2,7 @@
 
 A lightweight CLI-based tool that automates reconnaissance and vulnerability scanning for web targets. This project simulates a real-world security assessment workflow by combining information gathering, crawling, data extraction, and vulnerability scanning.
 
-* Features
+* **Features**
 - Accepts domain, URL, or IP as input
 - Performs automated reconnaissance
 - Recursive web crawling
@@ -13,6 +13,7 @@ A lightweight CLI-based tool that automates reconnaissance and vulnerability sca
 - Structured JSON report generation
 - Clean CLI output
 - Project Structure
+
 
   
 scanner/
@@ -25,37 +26,9 @@ scanner/
 └── output/            # Scan reports
 
 
-⚙️ Installation
 
-1️ Clone Repository
-git clone https://github.com/# Recon_Scanner:Automated Reconnaissance & Vulnerability Scanner
-
-A lightweight CLI-based tool that automates reconnaissance and vulnerability scanning for web targets. This project simulates a real-world security assessment workflow by combining information gathering, crawling, data extraction, and vulnerability scanning.
-
-* Features
-- Accepts domain, URL, or IP as input
-- Performs automated reconnaissance
-- Recursive web crawling
-- Endpoint and URL collection
-- Parameter extraction
-- JavaScript file discovery
-- Integration with Nikto and Nuclei
-- Structured JSON report generation
-- Clean CLI output
-- Project Structure
-
-  
-scanner/
-├── main.py            # Entry point
-├── recon.py           # Reconnaissance (nmap, headers)
-├── crawler.py         # Recursive crawler
-├── extractor.py       # Params + JS extraction
-├── vulnscan.py        # Nikto + Nuclei integration
-├── report.py          # Report generation
-└── output/            # Scan reports
-
-
-⚙️ Installation
+ **Installation**
+ 
 
 1️ Clone Repository
 git clone https://github.com/ZakiaSultana57/recon-scanner.git
