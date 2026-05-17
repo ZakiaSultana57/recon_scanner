@@ -34,10 +34,16 @@ output/
 git clone https://github.com/ZakiaSultana57/recon_scanner.git
 cd recon-scanner
 
+
+
 2️ Install Python Dependencies
 pip install requests beautifulsoup4
 
+
+
 3️ Install Required Tools
+
+
 
 Make sure the following tools are installed and available in your system:
 
@@ -46,14 +52,20 @@ nikto
 nuclei
 curl
 
+
+
 Ubuntu/Debian:
 sudo apt update
 sudo apt install nmap nikto curl
 
+
+
 Install Nuclei:
 go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
 
+
 ▶️ Usage
+
 python main.py -t http://example.com
 
 
@@ -66,31 +78,6 @@ Sample Output
 [+] Report saved: output/report_2026-05-18_12-30-22.json
 
 📄 Sample Report Structure
-{
-    "target": "http://example.com",
-    "recon": {
-        "nmap": "...",
-        "headers": "..."
-    },
-    "urls": [
-        "http://example.com/login",
-        "http://example.com/api"
-    ],
-    "extracted": {
-        "parameters": {
-            "http://example.com?id=1": {
-                "id": ["1"]
-            }
-        },
-        "js_files": [
-            "http://example.com/app.js"
-        ]
-    },
-    "vulnerabilities": {
-        "nikto": "...",
-        "nuclei": "..."
-    }
-}
 
 
 Ethical Usage:
@@ -102,7 +89,9 @@ Important: This tool is intended for educational purposes only.
 3.Do NOT attempt exploitation or data destruction
 4.Do NOT perform Denial-of-Service (DoS) attacks
 
-**Conclusion**
+
+
+# **Conclusion**
 
 This project demonstrates a practical implementation of automated reconnaissance and vulnerability scanning using real-world tools and techniques. It provides a strong foundation for further development into a full-featured security assessment framework.
 Recon_scanner is designed to perform non-destructive reconnaissance and vulnerability scanning. Findings should be manually verified before being reported or used for remediation decisions.
