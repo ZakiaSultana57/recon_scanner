@@ -1,31 +1,15 @@
-"""
-ReconX - Banner Module
-"""
+import json
+import os
+from datetime import datetime
 
-BANNER = r"""
-██████╗ ███████╗ ██████╗ ██████╗ ███╗   ██╗██╗  ██╗
-██╔══██╗██╔════╝██╔════╝██╔═══██╗████╗  ██║╚██╗██╔╝
-██████╔╝█████╗  ██║     ██║   ██║██╔██╗ ██║ ╚███╔╝ 
-██╔══██╗██╔══╝  ██║     ██║   ██║██║╚██╗██║ ██╔██╗ 
-██║  ██║███████╗╚██████╗╚██████╔╝██║ ╚████║██╔╝ ██╗
-╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝
-"""
+def save_report(data):
+    if not os.path.exists("output"):
+        os.mkdir("output")
 
-VERSION = "1.0.0"
-AUTHOR  = "ReconX Security Tool"
-TAGLINE = "Automated Reconnaissance & Vulnerability Scanner"
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"output/report_{timestamp}.json"
 
+    with open(filename, "w") as f:
+        json.dump(data, f, indent=4)
 
-def print_banner():
-    """Print the ASCII banner with color codes."""
-    CYAN   = "\033[96m"
-    GREEN  = "\033[92m"
-    YELLOW = "\033[93m"
-    RESET  = "\033[0m"
-    DIM    = "\033[2m"
-
-    print(f"{CYAN}{BANNER}{RESET}")
-    print(f"{GREEN}  {TAGLINE}{RESET}")
-    print(f"{DIM}  Version {VERSION}  |  {AUTHOR}{RESET}")
-    print(f"{YELLOW}  ⚠  Only scan systems you are authorized to test  ⚠{RESET}")
-    print()
+    print(f"\n[+] Report saved: {filename}")
