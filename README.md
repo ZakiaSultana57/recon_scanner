@@ -2,7 +2,7 @@
 
 A lightweight CLI-based tool that automates reconnaissance and vulnerability scanning for web targets. This project simulates a real-world security assessment workflow by combining information gathering, crawling, data extraction, and vulnerability scanning.
 
-* **Features**
+# **Features**
 - Accepts domain, URL, or IP as input
 - Performs automated reconnaissance
 - Recursive web crawling
@@ -27,7 +27,7 @@ output/
 
 
 
- **Installation**
+# **Installation**
  
 
 1️ Clone Repository
@@ -64,7 +64,7 @@ Install Nuclei:
 go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
 
 
-▶️ Usage
+# Usage
 
 python main.py -t http://example.com
 
@@ -77,10 +77,12 @@ Sample Output
 [+] Running vulnerability scans...
 [+] Report saved: output/report_2026-05-18_12-30-22.json
 
+
+
 📄 Sample Report Structure
 
 
-Ethical Usage:
+# Ethical Usage:
  
 Important: This tool is intended for educational purposes only.
 
