@@ -34,7 +34,7 @@ requirements.txt  # Notes for dependencies
 
 ## Installation
 
-ReconX core requires Python 3.9+ and uses the standard library.
+Recon_Scanner core requires Python 3.9+ and uses the standard library.
 
 ```bash
 python3 --version
