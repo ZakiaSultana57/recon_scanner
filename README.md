@@ -31,7 +31,7 @@ scanner/
  
 
 1️ Clone Repository
-git clone https://github.com/ZakiaSultana57/recon-scanner.git
+git clone https://github.com/ZakiaSultana57/recon_scanner.git
 cd recon-scanner
 
 2️ Install Python Dependencies
