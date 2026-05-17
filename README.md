@@ -1,188 +1,109 @@
-Automated Reconnaissance & Vulnerability Scanner
-(Project Name: ReconX – or rename as needed)
+is a CLI-based security assessment tool for authorized web targets. It automates reconnaissance, crawling, attack surface collection, and vulnerability scanning with built-in checks plus integrations for Nikto and Nuclei.
 
-A modular CLI-based cybersecurity automation framework for passive & active reconnaissance, attack surface mapping, vulnerability scanning, and HTML report generation.
+Use this only on systems you own, local labs, or targets where you have explicit written permission. The scanner is rate-limited and non-destructive by design, but authorization is still mandatory.
 
- Overview
+Features
+Accepts a domain, subdomain, URL, or IP address.
+Collects DNS data, HTTP headers, technologies, open ports, subdomains, JavaScript files, forms, parameters, and interesting endpoints.
+Recursively crawls in-scope pages with deduplication and configurable depth.
+Runs safe custom checks for missing security headers, exposed services, reflected parameters, directory listing, plaintext credential forms, and potential JavaScript secrets.
+Integrates Nikto and Nuclei when installed on the system.
+Generates JSON, Markdown, and HTML reports with severity levels and timestamps.
+Uses threaded port scanning/crawling with conservative timeouts.
+Includes a local demo target for sample scans.
+Project Structure
+reconx/
+  cli.py          # CLI orchestration
+  recon.py        # DNS, subdomain, port, header, technology recon
+  crawler.py      # Recursive crawler, endpoints, JS, forms, parameters
+  vuln.py         # Built-in checks plus Nikto/Nuclei wrappers
+  report.py       # JSON, Markdown, HTML report generation
+  target.py       # Target normalization
+samples/
+  test_site.py    # Local demo target for safe testing
+main.py           # Entry point
+Dockerfile        # Container support
+requirements.txt  # Notes for dependencies
+Installation
+ReconX core requires Python 3.9+ and uses the standard library.
 
-This tool automates real-world security assessment workflows by combining:
+python3 --version
+python3 main.py --help
+For full project requirements, install Nikto and Nuclei too.
 
- Passive Reconnaissance
- Active Reconnaissance
- Web Crawling & Endpoint Discovery
- Vulnerability Scanning (Nikto + Nuclei)
-Structured Reporting (CLI + JSON + HTML)
+macOS with Homebrew:
 
-It is designed for ethical hacking labs, bug bounty recon, and cybersecurity education.
+brew install nikto nuclei
+nuclei -update-templates
+Debian/Ubuntu:
 
- Disclaimer
+sudo apt update
+sudo apt install -y nikto
+go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+nuclei -update-templates
+Usage
+Always confirm authorization:
 
-This tool is strictly intended for:
+python3 main.py https://example.com --i-have-authorization
+Common options:
 
-✔ Authorized penetration testing
-✔ Security research labs (DVWA, Juice Shop, etc.)
-✔ Bug bounty programs with permission
+python3 main.py http://127.0.0.1:8088 \
+  --i-have-authorization \
+  --depth 2 \
+  --max-pages 30 \
+  --ports web \
+  --tool-timeout 120
+Skip external tools during quick local tests:
 
-❌ Unauthorized scanning is illegal and strictly prohibited.
+python3 main.py http://127.0.0.1:8088 --i-have-authorization --skip-nikto --skip-nuclei
+Reports are saved in reports/:
 
-🚀 Features
-🔍 Reconnaissance Engine
-Subdomain enumeration
-DNS record extraction
-WHOIS lookup
-Technology fingerprinting
-HTTP header analysis
-Open port detection (safe mode)
-JavaScript file discovery
-Endpoint and directory enumeration
-🧠 Crawling System
-Recursive web crawling (configurable depth)
-URL and parameter extraction
-Form detection
-JavaScript endpoint parsing
-Smart deduplication & filtering
-⚡ Active Recon
-Lightweight port scanning
-Service banner grabbing
-HTTP probing
-Rate-limited requests (safe-by-default)
-🧪 Vulnerability Scanning
+*.json for structured data.
+*.md for readable submission evidence.
+*.html for a dashboard-style report.
+Safe Local Demo
+Terminal 1:
 
-Integrated security tools:
+python3 samples/test_site.py --host 127.0.0.1 --port 8088
+Terminal 2:
 
-🔹 Nikto (web server scanning)
-🔹 Nuclei (template-based scanning)
+python3 main.py http://127.0.0.1:8088 \
+  --i-have-authorization \
+  --depth 2 \
+  --max-pages 20 \
+  --ports web \
+  --skip-nikto \
+  --skip-nuclei
+The demo intentionally exposes harmless issues so your report contains findings without scanning a real third-party target.
 
-Custom checks:
+This repository includes a verified sample report generated from that demo under samples/reports/. The matching console transcript is in samples/sample_console_output.txt.
 
-Missing security headers
-Exposed directories
-Weak HTTP methods
-Misconfigurations
-📊 Reporting Engine
+Docker
+Build:
 
-The tool generates:
+docker build -t reconx .
+Run against a permitted target:
 
-✔ CLI Report
-Colored structured output
-Severity-based grouping
-✔ JSON Report
-Machine-readable output for automation
-✔ HTML Report (🔥 Hacker Theme UI)
-Dark cyber UI design
-Neon highlights (green/cyan/purple)
-Scan timeline visualization
-Vulnerability dashboard
-Clickable endpoints
-Severity cards (Low → Critical)
-🏗️ Architecture
-recon_tool/
-│
-├── core/              # CLI engine + config + logging
-├── recon/             # passive + active recon modules
-├── crawler/           # web crawler + JS analyzer
-├── scanner/           # nikto + nuclei + custom checks
-├── report/            # HTML + JSON report generator
-├── utils/             # helpers (requests, parsing, formatting)
-├── templates/         # HTML themes (hacker UI)
-│
-├── main.py            # entry point
-├── requirements.txt
-└── setup.py
-⚙️ Installation
-1. Clone Repository
-git clone https://github.com/your-username/reconx.git
-cd reconx
-2. Create Virtual Environment
-python3 -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
-3. Install Dependencies
-pip install -r requirements.txt
-4. Install External Tools
-Nikto
-sudo apt install nikto
-Nuclei
-go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
-🧑‍💻 Usage
-🔹 Basic Scan
-python main.py -t example.com
-🔹 Full Recon + Vulnerability Scan
-python main.py -t example.com --full
-🔹 Recon Only Mode
-python main.py -t example.com --recon
-🔹 Scan Only Mode
-python main.py -t example.com --scan
-📤 Output Example
-[+] Target: example.com
-[+] Mode: Full Scan Initiated
+docker run --rm -v "$PWD/reports:/app/reports" reconx https://example.com --i-have-authorization
+Report Contents
+Each report contains:
 
-==================== RECON ====================
-Subdomains:        14 found
-Technologies:      Nginx, PHP, Cloudflare
-JS Files:          9 discovered
-Endpoints:         52 collected
+Target information and scan timestamp.
+DNS and subdomain findings.
+Open ports and likely services.
+HTTP headers and detected technologies.
+Crawled endpoints, parameters, forms, and JavaScript files.
+Custom, Nikto, and Nuclei vulnerability findings.
+Severity counts and remediation guidance
 
-================ VULNERABILITIES ================
-[HIGH] Missing Security Headers
-[HIGH] XSS Vulnerability Detected
-[MEDIUM] Open Directory Listing
+Ethics and Restrictions
+Scan only authorized targets.
+Do not use this tool for denial-of-service or destructive testing.
+Validate automated findings manually before reporting them.
+Keep rate limits and timeouts conservative on shared environments.
+Disclaimer
+This project is developed strictly for educational purposes and authorized security testing only. The tool must only be used on systems that you own, manage, or have explicit written permission to test, such as local labs, personal virtual machines, or approved bug bounty targets.
 
-==================== REPORT ====================
-HTML Report: reports/example_com_report.html
-JSON Report: reports/example_com_report.json
-📊 Report Features (HTML)
+The author is not responsible for any misuse, unauthorized scanning, service disruption, data loss, or legal consequences caused by improper use of this tool. Users are responsible for following all applicable laws, institutional policies, and ethical hacking guidelines.
 
-The HTML report includes:
-
-🧠 Target summary dashboard
-🔍 Recon intelligence panel
-🧪 Vulnerability breakdown
-⚠️ Risk severity visualization
-📂 Endpoint explorer
-⏱️ Scan timeline
-🎨 Cyberpunk hacker UI theme
-🧩 Bonus Features
-⚡ Multi-threaded scanning engine
-🔄 Async crawling (aiohttp)
-🧠 AI-powered vulnerability summarization (optional)
-🐳 Docker support
-🌐 Web dashboard (future upgrade)
-📡 API mode (FastAPI support)
-🕵️ Stealth / rate-limited scanning mode
-📦 requirements.txt
-requests
-beautifulsoup4
-lxml
-colorama
-tqdm
-dnspython
-python-nmap
-jinja2
-termcolor
-aiohttp
-🧾 setup.py
-from setuptools import setup, find_packages
-
-setup(
-    name="reconx",
-    version="1.0.0",
-    packages=find_packages(),
-    install_requires=[
-        "requests",
-        "beautifulsoup4",
-        "lxml",
-        "colorama",
-        "tqdm",
-        "dnspython",
-        "python-nmap",
-        "jinja2",
-        "termcolor",
-        "aiohttp"
-    ],
-    entry_points={
-        "console_scripts": [
-            "reconx = main:main"
-        ]
-    },
-)
+ReconX is designed to perform non-destructive reconnaissance and vulnerability scanning. Findings should be manually verified before being reported or used for remediation decisions.
