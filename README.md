@@ -70,11 +70,17 @@ python main.py -t http://example.com
 
 
 Sample Output
+
 Starting scan...
+
 Running Recon...
+
 Crawling target...
+
 Extracting data...
+
 Running vulnerability scans...
+
 Report saved: output/report_2026-05-18_12-30-22.json
 
 
