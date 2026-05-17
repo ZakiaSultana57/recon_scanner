@@ -17,13 +17,13 @@ A lightweight CLI-based tool that automates reconnaissance and vulnerability sca
 
   
 scanner/
-├── main.py            # Entry point
-├── recon.py           # Reconnaissance (nmap, headers)
-├── crawler.py         # Recursive crawler
-├── extractor.py       # Params + JS extraction
-├── vulnscan.py        # Nikto + Nuclei integration
-├── report.py          # Report generation
-└── output/            # Scan reports
+main.py            
+recon.py          
+crawler.py         
+extractor.py       
+vulnscan.py        
+report.py          
+output/            
 
 
 
